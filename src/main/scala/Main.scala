@@ -5,18 +5,17 @@ trait Borrowable {
   def returnItem(): Boolean
 }
 //b. Créer une classe abstraite Document qui implémente Borrowable
-// Classe abstraite Document
-abstract class Document(
+// Classe abstraite Document: une classe non instanciable
+  abstract class Document(
   val title: String,
   val author: String,
   val year: Int,
-  protected var isBorrowed: Boolean = false // aucun document emprunté au départ
+  var isBorrowed: Boolean = false // aucun document emprunté au départ
 ) extends Borrowable {
 
   // Méthodes de Borrowable
   override def borrow(): Boolean = {
     if (!isBorrowed) {
-      isBorrowed = true
       true
     } else {
       false
@@ -25,7 +24,6 @@ abstract class Document(
 
   override def returnItem(): Boolean = {
     if (isBorrowed) {
-      isBorrowed = false
       true
     } else {
       false
@@ -86,6 +84,7 @@ class User(val name: String) {
   def borrowDocument(doc: Document): Boolean = {
     if (doc.borrow()) { // utilise la méthode borrow du document
       borrowedDocs = borrowedDocs :+ doc
+      doc.isBorrowed = true // Marque le document comme emprunté
       true
     } else {
       false
@@ -95,7 +94,8 @@ class User(val name: String) {
   // 2. Retourner un document
   def returnDocument(doc: Document): Boolean = {
     if (borrowedDocs.contains(doc) && doc.returnItem()) {
-      borrowedDocs = borrowedDocs.filterNot(_ == doc)
+      borrowedDocs = borrowedDocs.filterNot(_ == doc) // Retire le document de la liste des empruntés
+      doc.isBorrowed = false // Marque le document comme retourné
       true
     } else {
       false
@@ -136,7 +136,7 @@ class Library {
 
   // 3. Lister les documents disponibles
   def listAvailableDocuments(): Unit = {
-    val availableDocs = documents.filter(d => !d.borrow())
+    val availableDocs = documents.filter(d => d.borrow())
     if (availableDocs.isEmpty) {
       println("Aucun document disponible.")
     } else {
@@ -189,3 +189,5 @@ object Main extends App {
   user1.listBorrowedDocuments()
   library.listAvailableDocuments()
 }
+
+
